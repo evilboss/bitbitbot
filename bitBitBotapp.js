@@ -159,9 +159,17 @@ var wallet = function (message) {
     });
 }
 var mybtc = function (message) {
+  var walletList = getWallets();
+  var returnMessage = 'You have no wallet yet';
+  _.each(walletList, function (wallet) {
+    if (message.from.id === wallet.id) {
+      returnMessage = 'Your BTC Balance is ' + wallet.amount;
+    }
+
+  });
   var answer = {
     chat_id: message.chat.id,
-    text: 'my bitcoin'
+    text: returnMessage
   };
   unirest.post(SEND_MESSAGE_URL)
     .send(answer)
@@ -170,30 +178,30 @@ var mybtc = function (message) {
 }
 
 // Define available commands and map them to functions which should be executed
-// Our bot would accept command "/get", "/true" and "/false"
-var COMMANDS = {
-  'bitcoin': getBitCoin,
-  'btc': btc,
-  'wallet': wallet,
-  'mybtc': mybtc,
-};
+// Our bot would accept command "/bitcoin", "/btc"  "/wallet" and "mybtc"
+  var COMMANDS = {
+    'bitcoin': getBitCoin,
+    'btc': btc,
+    'wallet': wallet,
+    'mybtc': mybtc,
+  };
 
-function runCommand(message) {
-  var msgtext = message.text;
-  // Validate message text whether it actually is a command
-  if (msgtext.indexOf("/") != 0) return false; // no slash at beginning? --> no command --> return
-  // Only interpret the text after the preceeding slash and to the first blank space as command, i.e. extract "mycommand" out of "/mycommand First argument"
-  var command = (msgtext.indexOf(" ") == -1) ? msgtext.substring(1, msgtext.length) : msgtext.substring(1, msgtext.indexOf(" "));
-  if (DEBUG) console.log("command is " + command);
-  // Check whether the command exists, i.e. we have a mapping for it
-  if (COMMANDS[command] == null) return false; // not a valid command?
-  // Actually run the corresponding function
-  COMMANDS[command](message);
-  return true;
-}
+  function runCommand(message) {
+    var msgtext = message.text;
+    // Validate message text whether it actually is a command
+    if (msgtext.indexOf("/") != 0) return false; // no slash at beginning? --> no command --> return
+    // Only interpret the text after the preceeding slash and to the first blank space as command, i.e. extract "mycommand" out of "/mycommand First argument"
+    var command = (msgtext.indexOf(" ") == -1) ? msgtext.substring(1, msgtext.length) : msgtext.substring(1, msgtext.indexOf(" "));
+    if (DEBUG) console.log("command is " + command);
+    // Check whether the command exists, i.e. we have a mapping for it
+    if (COMMANDS[command] == null) return false; // not a valid command?
+    // Actually run the corresponding function
+    COMMANDS[command](message);
+    return true;
+  }
 
 // Returns a random integer between 0 and max
-function randomInt(max) {
-  return Math.round((Math.random() * max));
-}
+  function randomInt(max) {
+    return Math.round((Math.random() * max));
+  }
   
